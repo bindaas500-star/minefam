@@ -20,6 +20,14 @@
     <div class="coin-pill">🪙 <span id="coinBalance">0</span></div>
   </div>
 
+  <div class="streak-banner" id="streakBanner">
+    <div>
+      <div style="font-size:13px; color:var(--text-dim);">Daily Streak</div>
+      <div style="font-size:18px; font-weight:700; color:var(--gold);" id="streakCount">Day 1</div>
+    </div>
+    <div class="streak-days" id="streakDays"></div>
+  </div>
+
   <div class="card miner-card">
     <div class="miner-orb"><span class="icon">⛏️</span></div>
     <div style="font-size:14px; color:var(--text-dim);">Miner Level <span id="minerLevel">1</span></div>
@@ -41,6 +49,16 @@
       <div class="label">Live Rooms</div>
       <div class="sub">Chat & earn</div>
     </a>
+    <a href="spin.html" class="tile">
+      <div class="icon-box" style="background:rgba(242,183,5,0.15); color:var(--gold);">🎡</div>
+      <div class="label">Spin Wheel</div>
+      <div class="sub">Daily free spin</div>
+    </a>
+    <a href="mystery.html" class="tile">
+      <div class="icon-box" style="background:rgba(47,211,199,0.15); color:var(--teal);">🎁</div>
+      <div class="label">Mystery Box</div>
+      <div class="sub">Pick & reveal</div>
+    </a>
   </div>
 
   <div class="card">
@@ -59,7 +77,9 @@
 <nav class="bottom-nav">
   <div class="nav-item active"><span class="nav-icon">⛏️</span>Mine</div>
   <a href="family.html" class="nav-item"><span class="nav-icon">👨‍👩‍👧</span>Family</a>
-  <a href="rooms.html" class="nav-item"><span class="nav-icon">💬</span>R
+  <a href="rooms.html" class="nav-item"><span class="nav-icon">💬</span>Rooms</a>
+</nav>
+
 <script type="module" src="dashboard.js"></script>
 </body>
 </html>
