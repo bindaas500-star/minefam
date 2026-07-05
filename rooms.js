@@ -5,6 +5,11 @@ onAuthStateChanged(auth, async (user) => {
     window.location.href = "index.html";
     return;
   }
-  const snap = await get(ref(db, `users/${user.uid}/coins`));
-  document.getElementById("coinBalance").textContent = Math.floor(snap.val() || 0);
+  const snap = await get(ref(db, `users/${user.uid}`));
+  const data = snap.val();
+  document.getElementById("coinBalance").textContent = Math.floor(data.coins || 0);
+
+  if (data.isVIP) {
+    document.getElementById("vipRoomItem").style.display = "flex";
+  }
 });
