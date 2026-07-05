@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MineFam - Mystery Box</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1113">
+</head>
+<body>
+
+<div class="app-shell">
+  <div class="topbar">
+    <div>
+      <a href="dashboard.html" style="color:var(--text-dim); font-size:13px;">&larr; Dashboard</a>
+      <div class="username" style="margin-top:4px;">Mystery Box</div>
+    </div>
+    <div class="coin-pill">🪙 <span id="coinBalance">0</span></div>
+  </div>
+
+  <div class="card" style="text-align:center;">
+    <div style="font-size:13px; color:var(--text-dim);" id="boxStatus">Loading...</div>
+  </div>
+
+  <div class="box-grid" id="boxGrid">
+    <div class="mystery-box" data-index="0">🎁</div>
+    <div class="mystery-box" data-index="1">🎁</div>
+    <div class="mystery-box" data-index="2">🎁</div>
+  </div>
+
+  <div class="card reward-reveal" id="rewardCard" style="display:none;">
+    <div style="font-size:14px; color:var(--text-dim);">Aapko mila</div>
+    <div class="amount" id="rewardAmount">+0 🪙</div>
+  </div>
+</div>
+
+<div id="toastHost"></div>
+
+<script type="module" src="mystery.js"></script>
+</body>
+</html>
