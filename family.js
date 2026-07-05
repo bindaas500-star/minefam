@@ -49,17 +49,29 @@ async function loadFamily(familyId) {
     const mSnap = await get(ref(db, `users/${uid}`));
     if (!mSnap.exists()) continue;
     const m = mSnap.val();
+    const isMe = uid === currentUser.uid;
     const row = document.createElement("div");
     row.className = "member-row";
     row.innerHTML = `
       <div style="display:flex; align-items:center; gap:10px;">
         <div class="avatar-dot">${(m.displayName || "M")[0].toUpperCase()}</div>
-        <span style="font-size:14px;">${m.displayName || "Miner"}</span>
+        <span style="font-size:14px;">${m.displayName || "Miner"}${m.isVIP ? '<span class="vip-badge">👑</span>' : ""}</span>
       </div>
-      <span style="font-size:13px; color:var(--gold);">${Math.floor(m.coins || 0)} 🪙</span>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:13px; color:var(--gold);">${Math.floor(m.coins || 0)} 🪙</span>
+        ${isMe ? "" : `<button class="dm-btn" data-uid="${uid}" data-name="${(m.displayName || "Miner").replace(/"/g, "&quot;")}">Message</button>`}
+      </div>
     `;
     listEl.appendChild(row);
   }
+
+  listEl.querySelectorAll(".dm-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const uid = btn.dataset.uid;
+      const name = encodeURIComponent(btn.dataset.name);
+      window.location.href = `dm.html?uid=${uid}&name=${name}`;
+    });
+  });
 }
 
 document.getElementById("createFamilyBtn").addEventListener("click", async () => {
