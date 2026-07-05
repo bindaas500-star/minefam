@@ -27,6 +27,7 @@ async function loadUser() {
   userData = snap.val();
 
   document.getElementById("userName").textContent = userData.displayName || "Miner";
+  document.getElementById("userName").innerHTML = (userData.displayName || "Miner") + (userData.isVIP ? ' <span class="vip-badge">👑</span>' : "");
   renderCoins(userData.coins || 0);
   renderMinerInfo();
   computeClaimable();
@@ -91,10 +92,19 @@ function renderCoins(coins) {
   document.getElementById("walletCoins").textContent = `${Math.floor(coins)} 🪙`;
 }
 
+function getEffectiveRate() {
+  const level = userData.minerLevel || 1;
+  const base = LEVEL_RATE[level];
+  return userData.isVIP ? base * 2 : base;
+}
+
 function renderMinerInfo() {
   const level = userData.minerLevel || 1;
   document.getElementById("minerLevel").textContent = level;
-  document.getElementById("miningRate").textContent = `Earning ${LEVEL_RATE[level]} coins/hour idle`;
+  const rate = getEffectiveRate();
+  document.getElementById("miningRate").textContent = userData.isVIP
+    ? `Earning ${rate} coins/hour idle (👑 VIP 2x)`
+    : `Earning ${rate} coins/hour idle`;
 
   if (level >= MAX_LEVEL) {
     document.getElementById("upgradeBtn").textContent = "Max Level Reached";
@@ -106,8 +116,7 @@ function renderMinerInfo() {
 }
 
 function computeClaimable() {
-  const level = userData.minerLevel || 1;
-  const rate = LEVEL_RATE[level];
+  const rate = getEffectiveRate();
   const lastClaim = userData.lastClaim || Date.now();
   const hoursElapsed = Math.min((Date.now() - lastClaim) / 3600000, MAX_ACCRUAL_HOURS);
   const claimable = Math.floor(hoursElapsed * rate);
@@ -121,7 +130,8 @@ document.getElementById("claimBtn").addEventListener("click", async () => {
     const result = await runTransaction(userRef, (data) => {
       if (!data) return data;
       const level = data.minerLevel || 1;
-      const rate = LEVEL_RATE[level];
+      let rate = LEVEL_RATE[level];
+      if (data.isVIP) rate *= 2;
       const lastClaim = data.lastClaim || Date.now();
       const hoursElapsed = Math.min((Date.now() - lastClaim) / 3600000, MAX_ACCRUAL_HOURS);
       const claimable = Math.floor(hoursElapsed * rate);
