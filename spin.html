@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MineFam - Spin Wheel</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1113">
+</head>
+<body>
+
+<div class="app-shell">
+  <div class="topbar">
+    <div>
+      <a href="dashboard.html" style="color:var(--text-dim); font-size:13px;">&larr; Dashboard</a>
+      <div class="username" style="margin-top:4px;">Spin Wheel</div>
+    </div>
+    <div class="coin-pill">🪙 <span id="coinBalance">0</span></div>
+  </div>
+
+  <div class="wheel-wrap">
+    <div class="wheel-container">
+      <div class="wheel-pointer"></div>
+      <div class="wheel" id="wheel">
+        <div class="wheel-hub">🎡</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="spinBtn" style="max-width:220px;">Spin Now</button>
+    <div class="spin-status" id="spinStatus">Loading...</div>
+  </div>
+</div>
+
+<div id="toastHost"></div>
+
+<script type="module" src="spin.js"></script>
+</body>
+</html>
