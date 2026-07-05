@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MineFam - Feed</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1113">
+</head>
+<body>
+
+<div class="app-shell">
+  <div class="topbar">
+    <div>
+      <a href="dashboard.html" style="color:var(--text-dim); font-size:13px;">&larr; Dashboard</a>
+      <div class="username" style="margin-top:4px;">Feed</div>
+    </div>
+    <div class="coin-pill">🪙 <span id="coinBalance">0</span></div>
+  </div>
+
+  <div class="card">
+    <textarea id="postInput" maxlength="280" placeholder="Kya soch rahe hen?" style="width:100%; background:var(--bg-elevated); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:12px 14px; font-size:14px; font-family:'Inter',sans-serif; resize:none; min-height:70px;"></textarea>
+    <button class="btn btn-primary" id="postBtn" style="margin-top:10px;">Post</button>
+  </div>
+
+  <div class="section-title">Recent Posts</div>
+  <div id="postList">
+    <div class="empty-state">Loading posts…</div>
+  </div>
+</div>
+
+<div id="toastHost"></div>
+
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="nav-item"><span class="nav-icon">⛏️</span>Mine</a>
+  <a href="family.html" class="nav-item"><span class="nav-icon">👨‍👩‍👧</span>Family</a>
+  <div class="nav-item active"><span class="nav-icon">📝</span>Feed</div>
+</nav>
+
+<script type="module" src="feed.js"></script>
+</body>
+</html>
