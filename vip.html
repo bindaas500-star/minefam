@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MineFam - VIP</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1113">
+</head>
+<body>
+
+<div class="app-shell">
+  <div class="topbar">
+    <div>
+      <a href="dashboard.html" style="color:var(--text-dim); font-size:13px;">&larr; Dashboard</a>
+      <div class="username" style="margin-top:4px;">VIP Membership</div>
+    </div>
+    <div class="coin-pill">🪙 <span id="coinBalance">0</span></div>
+  </div>
+
+  <div class="card" style="text-align:center; background:radial-gradient(circle at 50% 0%, rgba(242,183,5,0.18), var(--bg-card) 70%);">
+    <div style="font-size:48px;">👑</div>
+    <div style="font-size:20px; font-weight:700; margin-top:8px;" id="vipTitle">Become VIP</div>
+    <div style="font-size:13px; color:var(--text-dim); margin-top:6px;" id="vipSub">One-time upgrade, permanent perks</div>
+  </div>
+
+  <div class="card">
+    <div class="section-title" style="margin:0 0 12px;">VIP Perks</div>
+    <div style="display:flex; flex-direction:column; gap:12px; font-size:14px;">
+      <div>⚡ <b>2x Mining Rate</b> — double coins per hour, forever</div>
+      <div>👑 <b>VIP Badge</b> — golden crown shown next to your name everywhere</div>
+      <div>🔒 <b>VIP Lounge</b> — exclusive chat room, VIP members only</div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" id="upgradeVipBtn" style="margin-top:6px;">Upgrade for 5000 🪙</button>
+  <div class="spin-status" id="vipStatus"></div>
+</div>
+
+<div id="toastHost"></div>
+
+<script type="module" src="vip.js"></script>
+</body>
+</html>
