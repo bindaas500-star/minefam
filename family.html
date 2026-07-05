@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MineFam - Family</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1113">
+</head>
+<body>
+
+<div class="app-shell">
+  <div class="topbar">
+    <div>
+      <div class="greet">Team up</div>
+      <div class="username">Family</div>
+    </div>
+    <div class="coin-pill">🪙 <span id="coinBalance">0</span></div>
+  </div>
+
+  <div class="card">
+    <div class="section-title" style="margin:0 0 8px;">Your referral code</div>
+    <div class="ref-code-box">
+      <span class="code" id="myRefCode">------</span>
+      <button class="copy-btn" id="copyRefBtn">Copy</button>
+    </div>
+    <div style="font-size:12px; color:var(--text-dim); margin-top:8px;">
+      Jab koi is code se sign up kare, aapko 50 🪙 milte hen.
+    </div>
+  </div>
+
+  <div id="noFamilyBlock" class="card" style="display:none;">
+    <div class="section-title" style="margin:0 0 8px;">No family yet</div>
+    <p style="font-size:13px; color:var(--text-dim); margin:0 0 14px;">
+      Family bana kar apni referrals ko group mein jama karen aur collective goals complete karen.
+    </p>
+    <div class="field">
+      <input type="text" id="familyNameInput" placeholder="Family name">
+    </div>
+    <button class="btn btn-primary" id="createFamilyBtn">Create Family</button>
+  </div>
+
+  <div id="familyBlock" class="card" style="display:none;">
+    <div class="section-title" style="margin:0 0 4px;" id="familyNameLabel">—</div>
+    <div style="font-size:12px; color:var(--text-dim); margin-bottom:12px;" id="familyMemberCount">0 members</div>
+    <div id="memberList"></div>
+  </div>
+
+  <div class="section-title">Your referrals</div>
+  <div class="card">
+    <div id="referralList">
+      <div class="empty-state">Abhi tak koi referral nahi.</div>
+    </div>
+  </div>
+</div>
+
+<div id="toastHost"></div>
+
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="nav-item"><span class="nav-icon">⛏️</span>Mine</a>
+  <div class="nav-item active"><span class="nav-icon">👨‍👩‍👧</span>Family</div>
+  <a href="rooms.html" class="nav-item"><span class="nav-icon">💬</span>Rooms</a>
+</nav>
+
+<script type="module" src="js/family.js"></script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MineFam - Live Rooms</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1113">
+</head>
+<body>
+
+<div class="app-shell">
+  <div class="topbar">
+    <div>
+      <div class="greet">Stay active</div>
+      <div class="username">Live Rooms</div>
+    </div>
+    <div class="coin-pill">🪙 <span id="coinBalance">0</span></div>
+  </div>
+
+  <div class="card" style="text-align:center;">
+    <div style="font-size:13px; color:var(--text-dim); margin-bottom:10px;">
+      Room mein active reh kar coins kamayen
+    </div>
+    <div style="font-size:12px; color:var(--gold);">+1 🪙 har 5 minute active rehne par</div>
+  </div>
+
+  <div class="section-title">Rooms</div>
+  <div id="roomList">
+    <div class="room-list-item">
+      <div class="room-icon">💬</div>
+      <div style="flex:1;">
+        <div style="font-weight:600; font-size:14px;">General Chat</div>
+        <div style="font-size:12px; color:var(--text-dim);">Sab miners yahan baat karen</div>
+      </div>
+      <a href="room.html?id=general" class="btn btn-ghost" style="width:auto; padding:8px 14px; font-size:13px;">Join</a>
+    </div>
+    <div class="room-list-item">
+      <div class="room-icon">⛏️</div>
+      <div style="flex:1;">
+        <div style="font-weight:600; font-size:14px;">Mining Tips</div>
+        <div style="font-size:12px; color:var(--text-dim);">Upgrade strategy share karen</div>
+      </div>
+      <a href="room.html?id=mining-tips" class="btn btn-ghost" style="width:auto; padding:8px 14px; font-size:13px;">Join</a>
+    </div>
+    <div class="room-list-item">
+      <div class="room-icon">👨‍👩‍👧</div>
+      <div style="flex:1;">
+        <div style="font-weight:600; font-size:14px;">Family Lounge</div>
+        <div style="font-size:12px; color:var(--text-dim);">Apni family ke saath connect</div>
+      </div>
+      <a href="room.html?id=family-lounge" class="btn btn-ghost" style="width:auto; padding:8px 14px; font-size:13px;">Join</a>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="nav-item"><span class="nav-icon">⛏️</span>Mine</a>
+  <a href="family.html" class="nav-item"><span class="nav-icon">👨‍👩‍👧</span>Family</a>
+  <div class="nav-item active"><span class="nav-icon">💬</span>Rooms</div>
+</nav>
+
+<script type="module" src="js/rooms.js"></script>
+</body>
+</html>

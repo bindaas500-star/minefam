@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MineFam - Dashboard</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1113">
+</head>
+<body>
+
+<div class="app-shell">
+
+  <div class="topbar">
+    <div>
+      <div class="greet">Welcome back</div>
+      <div class="username" id="userName">—</div>
+    </div>
+    <div class="coin-pill">🪙 <span id="coinBalance">0</span></div>
+  </div>
+
+  <div class="card miner-card">
+    <div class="miner-orb"><span class="icon">⛏️</span></div>
+    <div style="font-size:14px; color:var(--text-dim);">Miner Level <span id="minerLevel">1</span></div>
+    <div class="miner-rate" id="miningRate">Earning 10 coins/hour idle</div>
+    <div class="claim-amount" id="claimableAmount">+0 🪙</div>
+    <button class="btn btn-primary" id="claimBtn" style="margin-top:10px;">Claim Coins</button>
+    <button class="btn btn-ghost" id="upgradeBtn" style="margin-top:10px;">Upgrade Miner (Level <span id="nextLevel">2</span> · <span id="upgradeCost">200</span> 🪙)</button>
+  </div>
+
+  <div class="section-title">Quick actions</div>
+  <div class="tile-grid">
+    <a href="family.html" class="tile">
+      <div class="icon-box" style="background:rgba(47,211,199,0.15); color:var(--teal);">👨‍👩‍👧</div>
+      <div class="label">Family</div>
+      <div class="sub">Team up & refer</div>
+    </a>
+    <a href="rooms.html" class="tile">
+      <div class="icon-box" style="background:rgba(242,183,5,0.15); color:var(--gold);">💬</div>
+      <div class="label">Live Rooms</div>
+      <div class="sub">Chat & earn</div>
+    </a>
+  </div>
+
+  <div class="card">
+    <div class="section-title" style="margin:0 0 6px;">Wallet</div>
+    <div style="display:flex; justify-content:space-between; font-size:14px; color:var(--text-dim);">
+      <span>Total balance</span>
+      <span style="color:var(--gold); font-weight:600;" id="walletCoins">0 🪙</span>
+    </div>
+  </div>
+
+  <button class="btn btn-ghost" id="logoutBtn">Log Out</button>
+</div>
+
+<div id="toastHost"></div>
+
+<nav class="bottom-nav">
+  <div class="nav-item active"><span class="nav-icon">⛏️</span>Mine</div>
+  <a href="family.html" class="nav-item"><span class="nav-icon">👨‍👩‍👧</span>Family</a>
+  <a href="rooms.html" class="nav-item"><span class="nav-icon">💬</span>Rooms</a>
+</nav>
+
+<script type="module" src="js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MineFam</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1113">
+</head>
+<body>
+
+<div class="auth-wrap">
+  <div class="brand-mark">
+    <div class="pickaxe">⛏️</div>
+    <div class="name display">MineFam</div>
+  </div>
+
+  <h1 id="formTitle" style="font-size:24px; margin-bottom:6px;">Welcome back</h1>
+  <p style="color:var(--text-dim); font-size:14px; margin-bottom:24px;" id="formSub">
+    Log in to keep mining and earning.
+  </p>
+
+  <form id="authForm">
+    <div class="field" id="nameField" style="display:none;">
+      <label>Display name</label>
+      <input type="text" id="displayName" placeholder="Your name" autocomplete="name">
+    </div>
+
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="email" placeholder="you@example.com" required autocomplete="email">
+    </div>
+
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+    </div>
+
+    <div class="field" id="refField" style="display:none;">
+      <label>Referral code (optional)</label>
+      <input type="text" id="refCode" placeholder="e.g. AB12CD">
+    </div>
+
+    <button type="submit" class="btn btn-primary" id="submitBtn">Log In</button>
+    <div class="error-msg" id="errorMsg"></div>
+  </form>
+
+  <div class="switch-line">
+    <span id="switchText">Don't have an account?</span>
+    <b id="switchLink">Sign up</b>
+  </div>
+</div>
+
+<script type="module" src="js/auth.js"></script>
+</body>
+</html>
