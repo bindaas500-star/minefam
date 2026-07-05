@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MineFam - Secret Message</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1113">
+</head>
+<body>
+
+<div class="app-shell" style="padding-bottom:20px;">
+  <div class="topbar">
+    <div>
+      <a href="family.html" style="color:var(--text-dim); font-size:13px;">&larr; Family</a>
+      <div class="username" id="dmTitle" style="margin-top:4px;">Secret Message</div>
+    </div>
+  </div>
+
+  <div class="chat-wrap">
+    <div class="chat-messages" id="chatMessages">
+      <div class="empty-state">Loading messages…</div>
+    </div>
+
+    <div class="chat-input-row">
+      <input type="text" id="msgInput" placeholder="Secret message..." maxlength="300">
+      <button id="sendBtn">➤</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastHost"></div>
+
+<script type="module" src="dm.js"></script>
+</body>
+</html>
