@@ -11,11 +11,13 @@ const roomId = params.get("id") || "general";
 const ROOM_NAMES = {
   "general": "General Chat",
   "mining-tips": "Mining Tips",
-  "family-lounge": "Family Lounge"
+  "family-lounge": "Family Lounge",
+  "vip-lounge": "VIP Lounge 👑"
 };
 
 let currentUser = null;
 let displayName = "Miner";
+let myIsVIP = false;
 let activeInterval = null;
 
 document.getElementById("roomTitle").textContent = ROOM_NAMES[roomId] || "Room";
@@ -30,7 +32,15 @@ onAuthStateChanged(auth, async (user) => {
   const snap = await get(ref(db, `users/${user.uid}`));
   const data = snap.val();
   displayName = data.displayName || "Miner";
+  myIsVIP = !!data.isVIP;
   document.getElementById("coinBalance").textContent = Math.floor(data.coins || 0);
+
+  if (roomId === "vip-lounge" && !myIsVIP) {
+    document.getElementById("chatMessages").innerHTML =
+      '<div class="empty-state">Ye room sirf VIP members ke liye hai. <a href="vip.html" style="color:var(--gold);">VIP banen</a></div>';
+    document.querySelector(".chat-input-row").style.display = "none";
+    return;
+  }
 
   listenToMessages();
   startActiveEarning();
@@ -56,7 +66,7 @@ function listenToMessages() {
       const bubble = document.createElement("div");
       bubble.className = `msg-bubble ${isMine ? "mine" : ""}`;
       bubble.innerHTML = `
-        ${isMine ? "" : `<div class="msg-sender">${escapeHtml(m.senderName || "Miner")}</div>`}
+        ${isMine ? "" : `<div class="msg-sender">${escapeHtml(m.senderName || "Miner")}${m.senderIsVIP ? '<span class="vip-badge">👑</span>' : ""}</div>`}
         ${escapeHtml(m.text)}
       `;
       container.appendChild(bubble);
@@ -79,6 +89,7 @@ async function sendMessage() {
   await push(ref(db, `rooms/${roomId}/messages`), {
     uid: currentUser.uid,
     senderName: displayName,
+    senderIsVIP: myIsVIP,
     text,
     createdAt: Date.now()
   });
