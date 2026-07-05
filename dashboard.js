@@ -30,6 +30,60 @@ async function loadUser() {
   renderCoins(userData.coins || 0);
   renderMinerInfo();
   computeClaimable();
+  await handleDailyStreak();
+}
+
+function todayStr() {
+  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
+async function handleDailyStreak() {
+  const userRef = ref(db, `users/${currentUser.uid}`);
+  const today = todayStr();
+
+  if (userData.lastLoginDate === today) {
+    renderStreak(userData.loginStreak || 1);
+    return; // already handled today
+  }
+
+  const result = await runTransaction(userRef, (data) => {
+    if (!data) return data;
+    const t = todayStr();
+    if (data.lastLoginDate === t) return data; // race guard
+
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    let newStreak = 1;
+    if (data.lastLoginDate === yesterday) {
+      newStreak = ((data.loginStreak || 0) % 7) + 1;
+    }
+    const bonus = newStreak * 5; // day1=5,...day7=35, cycles
+
+    data.loginStreak = newStreak;
+    data.lastLoginDate = t;
+    data.coins = (data.coins || 0) + bonus;
+    return data;
+  });
+
+  if (result.committed) {
+    const newData = result.snapshot.val();
+    userData = newData;
+    renderCoins(newData.coins || 0);
+    renderStreak(newData.loginStreak || 1);
+    const bonus = (newData.loginStreak || 1) * 5;
+    showToast(`Day ${newData.loginStreak} streak! +${bonus} 🪙`);
+  }
+}
+
+function renderStreak(streak) {
+  document.getElementById("streakCount").textContent = `Day ${streak}`;
+  const daysEl = document.getElementById("streakDays");
+  daysEl.innerHTML = "";
+  for (let i = 1; i <= 7; i++) {
+    const d = document.createElement("div");
+    d.className = "streak-day" + (i < streak ? " done" : i === streak ? " today" : "");
+    d.textContent = i;
+    daysEl.appendChild(d);
+  }
 }
 
 function renderCoins(coins) {
