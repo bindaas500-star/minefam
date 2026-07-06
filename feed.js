@@ -22,6 +22,15 @@ onAuthStateChanged(auth, async (user) => {
   myIsVIP = !!data.isVIP;
   document.getElementById("coinBalance").textContent = Math.floor(data.coins || 0);
 
+  const avatarEl = document.getElementById("topAvatar");
+  if (avatarEl) {
+    if (data.photoURL) {
+      avatarEl.innerHTML = `<img src="${data.photoURL}" alt="profile">`;
+    } else {
+      avatarEl.textContent = (data.displayName || "M")[0].toUpperCase();
+    }
+  }
+
   listenToPosts();
 });
 
@@ -56,7 +65,7 @@ function listenToPosts() {
     snap.forEach((childSnap) => {
       posts.push({ id: childSnap.key, ...childSnap.val() });
     });
-    posts.reverse(); // newest first
+    posts.reverse();
 
     container.innerHTML = "";
     posts.forEach((post) => {
