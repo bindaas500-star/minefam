@@ -1,7 +1,7 @@
 import {
   auth, db,
   onAuthStateChanged, signOut,
-  ref, get, update, runTransaction
+  ref, get, set, update, runTransaction
 } from "./firebase-config.js";
 
 // Rate per miner level: coins earned per hour
@@ -24,7 +24,32 @@ onAuthStateChanged(auth, async (user) => {
 
 async function loadUser() {
   const snap = await get(ref(db, `users/${currentUser.uid}`));
-  userData = snap.val();
+
+  if (!snap.exists()) {
+    function generateReferralCode() {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      let code = "";
+      for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+      return code;
+    }
+    const freshProfile = {
+      displayName: currentUser.displayName || "Miner",
+      email: currentUser.email || "",
+      coins: 100,
+      minerLevel: 1,
+      lastClaim: Date.now(),
+      referralCode: generateReferralCode(),
+      referredBy: null,
+      familyId: null,
+      createdAt: Date.now()
+    };
+    await set(ref(db, `users/${currentUser.uid}`), freshProfile);
+    await set(ref(db, `referralCodes/${freshProfile.referralCode}`), currentUser.uid);
+    showToast("Profile restore ho gaya, welcome bonus mil gaya! 🎉");
+  }
+
+  const freshSnap = await get(ref(db, `users/${currentUser.uid}`));
+  userData = freshSnap.val();
 
   document.getElementById("userName").textContent = userData.displayName || "Miner";
   document.getElementById("userName").innerHTML = (userData.displayName || "Miner") + (userData.isVIP ? ' <span class="vip-badge">👑</span>' : "");
@@ -57,7 +82,7 @@ async function handleDailyStreak() {
     if (data.lastLoginDate === yesterday) {
       newStreak = ((data.loginStreak || 0) % 7) + 1;
     }
-    const bonus = newStreak * 5; // day1=5,...day7=35, cycles
+    const bonus = newStreak * 5;
 
     data.loginStreak = newStreak;
     data.lastLoginDate = t;
@@ -135,7 +160,7 @@ document.getElementById("claimBtn").addEventListener("click", async () => {
       const lastClaim = data.lastClaim || Date.now();
       const hoursElapsed = Math.min((Date.now() - lastClaim) / 3600000, MAX_ACCRUAL_HOURS);
       const claimable = Math.floor(hoursElapsed * rate);
-      if (claimable <= 0) return data; // abort, nothing to claim
+      if (claimable <= 0) return data;
       data.coins = (data.coins || 0) + claimable;
       data.lastClaim = Date.now();
       return data;
@@ -161,7 +186,7 @@ document.getElementById("upgradeBtn").addEventListener("click", async () => {
   try {
     const result = await runTransaction(userRef, (data) => {
       if (!data) return data;
-      if ((data.coins || 0) < cost) return; // abort transaction
+      if ((data.coins || 0) < cost) return;
       data.coins -= cost;
       data.minerLevel = (data.minerLevel || 1) + 1;
       return data;
@@ -192,7 +217,6 @@ function showToast(message) {
   setTimeout(() => el.remove(), 2200);
 }
 
-// refresh claimable amount every 30s while user stays on page
 setInterval(() => {
   if (userData) computeClaimable();
 }, 30000);
