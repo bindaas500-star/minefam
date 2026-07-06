@@ -16,7 +16,10 @@
       <a href="dashboard.html" style="color:var(--text-dim); font-size:13px;">&larr; Dashboard</a>
       <div class="username" style="margin-top:4px;">Mystery Box</div>
     </div>
-    <div class="coin-pill">🪙 <span id="coinBalance">0</span></div>
+    <div class="topbar-right">
+      <div class="coin-pill">🪙 <span id="coinBalance">0</span></div>
+      <a href="profile.html" class="topbar-avatar" id="topAvatar">👤</a>
+    </div>
   </div>
 
   <div class="card" style="text-align:center;">
@@ -36,6 +39,12 @@
 </div>
 
 <div id="toastHost"></div>
+
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="nav-item"><span class="nav-icon">⛏️</span>Mine</a>
+  <a href="family.html" class="nav-item"><span class="nav-icon">👨‍👩‍👧</span>Family</a>
+  <a href="rooms.html" class="nav-item"><span class="nav-icon">💬</span>Rooms</a>
+</nav>
 
 <script type="module" src="mystery.js"></script>
 </body>
