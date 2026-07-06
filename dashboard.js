@@ -26,6 +26,7 @@ async function loadUser() {
   const snap = await get(ref(db, `users/${currentUser.uid}`));
 
   if (!snap.exists()) {
+    // Profile missing (likely lost to a network drop during signup) - recreate it
     function generateReferralCode() {
       const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
       let code = "";
@@ -53,10 +54,21 @@ async function loadUser() {
 
   document.getElementById("userName").textContent = userData.displayName || "Miner";
   document.getElementById("userName").innerHTML = (userData.displayName || "Miner") + (userData.isVIP ? ' <span class="vip-badge">👑</span>' : "");
+  renderTopAvatar(userData);
   renderCoins(userData.coins || 0);
   renderMinerInfo();
   computeClaimable();
   await handleDailyStreak();
+}
+
+function renderTopAvatar(data) {
+  const el = document.getElementById("topAvatar");
+  if (!el) return;
+  if (data.photoURL) {
+    el.innerHTML = `<img src="${data.photoURL}" alt="profile">`;
+  } else {
+    el.textContent = (data.displayName || "M")[0].toUpperCase();
+  }
 }
 
 function todayStr() {
@@ -82,7 +94,7 @@ async function handleDailyStreak() {
     if (data.lastLoginDate === yesterday) {
       newStreak = ((data.loginStreak || 0) % 7) + 1;
     }
-    const bonus = newStreak * 5;
+    const bonus = newStreak * 5; // day1=5,...day7=35, cycles
 
     data.loginStreak = newStreak;
     data.lastLoginDate = t;
@@ -160,7 +172,7 @@ document.getElementById("claimBtn").addEventListener("click", async () => {
       const lastClaim = data.lastClaim || Date.now();
       const hoursElapsed = Math.min((Date.now() - lastClaim) / 3600000, MAX_ACCRUAL_HOURS);
       const claimable = Math.floor(hoursElapsed * rate);
-      if (claimable <= 0) return data;
+      if (claimable <= 0) return data; // abort, nothing to claim
       data.coins = (data.coins || 0) + claimable;
       data.lastClaim = Date.now();
       return data;
@@ -186,7 +198,7 @@ document.getElementById("upgradeBtn").addEventListener("click", async () => {
   try {
     const result = await runTransaction(userRef, (data) => {
       if (!data) return data;
-      if ((data.coins || 0) < cost) return;
+      if ((data.coins || 0) < cost) return; // abort transaction
       data.coins -= cost;
       data.minerLevel = (data.minerLevel || 1) + 1;
       return data;
@@ -217,6 +229,7 @@ function showToast(message) {
   setTimeout(() => el.remove(), 2200);
 }
 
+// refresh claimable amount every 30s while user stays on page
 setInterval(() => {
   if (userData) computeClaimable();
 }, 30000);
