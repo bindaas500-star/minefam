@@ -29,6 +29,15 @@ async function loadUser() {
   const data = snap.val();
   document.getElementById("coinBalance").textContent = Math.floor(data.coins || 0);
 
+  const avatarEl = document.getElementById("topAvatar");
+  if (avatarEl) {
+    if (data.photoURL) {
+      avatarEl.innerHTML = `<img src="${data.photoURL}" alt="profile">`;
+    } else {
+      avatarEl.textContent = (data.displayName || "M")[0].toUpperCase();
+    }
+  }
+
   hasOpenedToday = data.lastMysteryDate === todayStr();
   updateStatus();
 }
