@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MineFam - Profile</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1113">
+</head>
+<body>
+
+<div class="app-shell">
+  <div class="topbar">
+    <div>
+      <a href="dashboard.html" style="color:var(--text-dim); font-size:13px;">&larr; Dashboard</a>
+    </div>
+    <div class="coin-pill">🪙 <span id="coinBalance">0</span></div>
+  </div>
+
+  <div class="profile-header">
+    <div class="avatar-wrap">
+      <div class="avatar-large" id="avatarLarge">M</div>
+      <div class="avatar-edit-btn" id="avatarEditBtn">✏️</div>
+      <input type="file" id="photoInput" accept="image/*" style="display:none;">
+    </div>
+
+    <div class="profile-name-row">
+      <span id="nameDisplay">Miner</span>
+      <span id="vipBadgeSpan"></span>
+      <button class="edit-name-btn" id="editNameBtn">✏️</button>
+    </div>
+    <div id="nameEditRow" style="display:none; margin-top:8px;">
+      <input type="text" id="nameInput" maxlength="24">
+      <button class="btn btn-primary" id="saveNameBtn" style="width:auto; padding:8px 16px; margin-left:6px; display:inline-flex;">Save</button>
+    </div>
+
+    <div class="profile-email" id="emailDisplay">—</div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-value" id="statCoins">0</div>
+      <div class="stat-label">Total Coins</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="statLevel">1</div>
+      <div class="stat-label">Miner Level</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="statStreak">1</div>
+      <div class="stat-label">Day Streak</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="statReferrals">0</div>
+      <div class="stat-label">Referrals</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title" style="margin:0 0 4px;">Account Info</div>
+    <div class="info-row">
+      <span class="label">Referral Code</span>
+      <span id="infoRefCode">------</span>
+    </div>
+    <div class="info-row">
+      <span class="label">Family</span>
+      <span id="infoFamily">None</span>
+    </div>
+    <div class="info-row">
+      <span class="label">Membership</span>
+      <span id="infoVIP">Standard</span>
+    </div>
+    <div class="info-row">
+      <span class="label">Member Since</span>
+      <span id="infoJoined">—</span>
+    </div>
+  </div>
+
+  <button class="btn btn-ghost" id="logoutBtn">Log Out</button>
+</div>
+
+<div id="toastHost"></div>
+
+<script type="module" src="profile.js"></script>
+</body>
+</html>
