@@ -31,6 +31,15 @@ async function loadUser() {
   const data = snap.val();
   document.getElementById("coinBalance").textContent = Math.floor(data.coins || 0);
 
+  const avatarEl = document.getElementById("topAvatar");
+  if (avatarEl) {
+    if (data.photoURL) {
+      avatarEl.innerHTML = `<img src="${data.photoURL}" alt="profile">`;
+    } else {
+      avatarEl.textContent = (data.displayName || "M")[0].toUpperCase();
+    }
+  }
+
   hasSpunToday = data.lastSpinDate === todayStr();
   updateStatus();
 }
@@ -52,6 +61,7 @@ function updateStatus() {
 function drawWheel() {
   const wheel = document.getElementById("wheel");
 
+  // Build conic-gradient background from segment colors
   const stops = SEGMENT_COLORS.map((color, i) => {
     const start = i * SEGMENT_ANGLE;
     const end = (i + 1) * SEGMENT_ANGLE;
@@ -59,13 +69,14 @@ function drawWheel() {
   }).join(", ");
   wheel.style.background = `conic-gradient(${stops})`;
 
+  // Place reward labels around the wheel
   const size = 280;
   const center = size / 2;
   const radius = 95;
 
   SEGMENTS.forEach((reward, i) => {
     const angleDeg = i * SEGMENT_ANGLE + SEGMENT_ANGLE / 2;
-    const angleRad = (angleDeg - 90) * (Math.PI / 180);
+    const angleRad = (angleDeg - 90) * (Math.PI / 180); // -90 to start from top
     const x = center + radius * Math.cos(angleRad);
     const y = center + radius * Math.sin(angleRad);
 
@@ -92,6 +103,8 @@ document.getElementById("spinBtn").addEventListener("click", async () => {
   const winningIndex = Math.floor(Math.random() * SEGMENTS.length);
   const reward = SEGMENTS[winningIndex];
 
+  // Rotate so the winning segment lands under the top pointer.
+  // Add multiple full spins for effect, and land on the center of the winning segment.
   const targetAngle = 360 * 5 - (winningIndex * SEGMENT_ANGLE + SEGMENT_ANGLE / 2);
   const wheel = document.getElementById("wheel");
   wheel.style.transform = `rotate(${targetAngle}deg)`;
@@ -102,7 +115,7 @@ document.getElementById("spinBtn").addEventListener("click", async () => {
   try {
     const result = await runTransaction(userRef, (data) => {
       if (!data) return data;
-      if (data.lastSpinDate === today) return data;
+      if (data.lastSpinDate === today) return data; // already spun, abort logically
       data.coins = (data.coins || 0) + reward;
       data.lastSpinDate = today;
       return data;
@@ -116,7 +129,7 @@ document.getElementById("spinBtn").addEventListener("click", async () => {
         hasSpunToday = true;
       }
       updateStatus();
-    }, 4200);
+    }, 4200); // wait for CSS spin animation to finish
   } catch (e) {
     btn.disabled = false;
     showToast("Spin failed, try again.");
