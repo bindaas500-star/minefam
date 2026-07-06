@@ -16,7 +16,10 @@
       <div class="greet">Stay active</div>
       <div class="username">Live Rooms</div>
     </div>
-    <div class="coin-pill">🪙 <span id="coinBalance">0</span></div>
+    <div class="topbar-right">
+      <div class="coin-pill">🪙 <span id="coinBalance">0</span></div>
+      <a href="profile.html" class="topbar-avatar" id="topAvatar">👤</a>
+    </div>
   </div>
 
   <div class="card" style="text-align:center;">
@@ -51,6 +54,14 @@
         <div style="font-size:12px; color:var(--text-dim);">Apni family ke saath connect</div>
       </div>
       <a href="room.html?id=family-lounge" class="btn btn-ghost" style="width:auto; padding:8px 14px; font-size:13px;">Join</a>
+    </div>
+    <div class="room-list-item" id="vipRoomItem" style="display:none;">
+      <div class="room-icon" style="background:linear-gradient(145deg, var(--gold), var(--gold-dim));">👑</div>
+      <div style="flex:1;">
+        <div style="font-weight:600; font-size:14px;">VIP Lounge</div>
+        <div style="font-size:12px; color:var(--text-dim);">Sirf VIP members ke liye</div>
+      </div>
+      <a href="room.html?id=vip-lounge" class="btn btn-ghost" style="width:auto; padding:8px 14px; font-size:13px;">Join</a>
     </div>
   </div>
 </div>
