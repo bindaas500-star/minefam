@@ -113,7 +113,7 @@
     </div>
 
     <p class="stage-info" id="stageInfoText"></p>
-    <p class="warning-text">Screen ko band ya minimize mat karo, warna session ruk jayega</p>
+    <p class="warning-text">Don't close or minimize this screen, or the session will stop</p>
 
     <button id="stopEarningBtn" onclick="stopEarningSession()">Stop Session</button>
   </div>
@@ -220,7 +220,7 @@ function startEarningSession() {
   const state = getSessionState();
 
   if (state.totalMinutesDone >= TOTAL_CAP_MIN) {
-    alert('Aaj ka 3 ghante ka earning limit complete ho chuka hai. Kal phir try karo.');
+    alert('You have completed today\'s 3-hour earning limit. Please try again tomorrow.');
     return;
   }
 
@@ -272,13 +272,13 @@ function finishStage(state, stageMin) {
   if (state.totalMinutesDone >= TOTAL_CAP_MIN) {
     state.active = false;
     saveSessionState(state);
-    alert('3 ghante ka session complete! Total coins ban chuke hain. Kal phir aana.');
+    alert('3-hour session complete! Your coins have been added. Come back tomorrow for more.');
     document.getElementById('earningSessionScreen').style.display = 'none';
     return;
   }
 
   saveSessionState(state);
-  alert('Stage complete! Agla stage (' + getStageDurationMinutes(state.stageIndex) + ' min) shuru hone wala hai.');
+  alert('Stage complete! Next stage (' + getStageDurationMinutes(state.stageIndex) + ' min) is about to start.');
   location.reload();
 }
 
@@ -307,7 +307,7 @@ window.addEventListener('load', () => {
 function updateDailyLimitText(state) {
   const el = document.getElementById('dailyLimitText');
   if (el) {
-    el.innerText = 'Aaj ka earning time: ' + state.totalMinutesDone + '/' + TOTAL_CAP_MIN + ' min';
+    el.innerText = 'Today\'s earning time: ' + state.totalMinutesDone + '/' + TOTAL_CAP_MIN + ' min';
   }
 }
 
