@@ -8,6 +8,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0f1113"> 
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9713902784355107" crossorigin="anonymous"></script>
+  <script src="https://quge5.com/88/tag.min.js" data-zone="257366" async data-cfasync="false"></script>
 </head>
 <body>
 
@@ -87,35 +88,20 @@
       <span style="color:var(--gold); font-weight:600;" id="walletCoins">0 🪙</span>
     </div>
   </div>
+
+  <!-- ===== AUTO EARNING FEATURE (multi-stage) ===== -->
+  <div id="startEarningCard" style="text-align:center; padding:20px;">
+    <button id="startEarningBtn" onclick="startEarningSession()">🚀 Start Earning</button>
+    <p id="dailyLimitText" style="color:#aaa; font-size:12px; margin-top:8px;"></p>
+  </div>
+  <!-- ===== END AUTO EARNING FEATURE ===== -->
+
+  <!-- NOTE: Log Out button yahan se hata diya gaya hai.
+       Wo ab sirf profile.html pe hona chahiye, dashboard pe nahi. -->
+
 </div>
 
-<div id="toastHost"></div>
-
-<nav class="bottom-nav">
-  <div class="nav-item active"><span class="nav-icon">⛏️</span>Mine</div>
-  <a href="family.html" class="nav-item"><span class="nav-icon">👨‍👩‍👧</span>Family</a>
-  <a href="rooms.html" class="nav-item"><span class="nav-icon">💬</span>Rooms</a>
-</nav>
-
-<script type="module" src="dashboard.js"></script>
-</body>
-</html>
-<!-- ============================================= -->
-<!-- AUTO EARNING FEATURE - MineFam (MULTI-STAGE)  -->
-<!-- Stages: 5 min -> 30 min -> 60 min -> 60 min... -->
-<!-- Total cap: 180 min (3 hours) per day           -->
-<!-- Page reloads between each stage                -->
-<!-- ============================================= -->
-
-<!-- 1) START EARNING BUTTON (Home screen pe dikhega) -->
-<div id="startEarningCard" style="text-align:center; padding:20px;">
-  <button id="startEarningBtn" onclick="startEarningSession()">
-    🚀 Start Earning
-  </button>
-  <p id="dailyLimitText" style="color:#aaa; font-size:12px; margin-top:8px;"></p>
-</div>
-
-<!-- 2) EARNING SESSION SCREEN (full screen overlay) -->
+<!-- Earning session full-screen overlay (body level, app-shell se bahar) -->
 <div id="earningSessionScreen" style="display:none;">
   <div class="session-box">
     <h2 id="stageTitle">Earning in Progress...</h2>
@@ -132,7 +118,7 @@
     <button id="stopEarningBtn" onclick="stopEarningSession()">Stop Session</button>
   </div>
 
-  <!-- 3) BACKGROUND AD ZONE - Monetag script yahan aayega -->
+  <!-- BACKGROUND AD ZONE - Monetag script yahan aayega -->
   <div id="backgroundAdZone" style="position:absolute; bottom:-9999px;">
     <!--
       MONETAG APPROVAL MILNE KE BAAD:
@@ -184,6 +170,16 @@
 #stopEarningBtn { background: #ff4757; box-shadow: 0 4px 15px rgba(255,71,87,0.4); }
 </style>
 
+<div id="toastHost"></div>
+
+<nav class="bottom-nav">
+  <div class="nav-item active"><span class="nav-icon">⛏️</span>Mine</div>
+  <a href="family.html" class="nav-item"><span class="nav-icon">👨‍👩‍👧</span>Family</a>
+  <a href="rooms.html" class="nav-item"><span class="nav-icon">💬</span>Rooms</a>
+</nav>
+
+<script type="module" src="dashboard.js"></script>
+
 <script>
 // ================================
 // MULTI-STAGE AUTO EARNING SESSION
@@ -199,9 +195,8 @@ let adRefreshInterval = null;
 let secondsLeftInStage = 0;
 let coinsEarnedThisStage = 0;
 
-// ---- Storage key (per-day reset) ----
 function getStorageKey() {
-  const today = new Date().toISOString().slice(0, 10); // e.g. 2026-07-07
+  const today = new Date().toISOString().slice(0, 10);
   return 'earningSession_' + today;
 }
 
@@ -218,10 +213,9 @@ function getStageDurationMinutes(stageIndex) {
   if (stageIndex < STAGE_DURATIONS_MIN.length) {
     return STAGE_DURATIONS_MIN[stageIndex];
   }
-  return STAGE_DURATIONS_MIN[STAGE_DURATIONS_MIN.length - 1]; // repeat last (60 min)
+  return STAGE_DURATIONS_MIN[STAGE_DURATIONS_MIN.length - 1];
 }
 
-// ---- Entry point: button click ----
 function startEarningSession() {
   const state = getSessionState();
 
@@ -235,11 +229,10 @@ function startEarningSession() {
   runCurrentStage(state);
 }
 
-// ---- Runs whichever stage is next ----
 function runCurrentStage(state) {
   const remainingCapMin = TOTAL_CAP_MIN - state.totalMinutesDone;
   let stageMin = getStageDurationMinutes(state.stageIndex);
-  if (stageMin > remainingCapMin) stageMin = remainingCapMin; // last stage trimmed to fit cap
+  if (stageMin > remainingCapMin) stageMin = remainingCapMin;
 
   secondsLeftInStage = stageMin * 60;
   coinsEarnedThisStage = 0;
@@ -267,7 +260,6 @@ function runCurrentStage(state) {
   }, AD_REFRESH_SECONDS * 1000);
 }
 
-// ---- Stage finished naturally (timer hit 0) ----
 function finishStage(state, stageMin) {
   clearInterval(sessionInterval);
   clearInterval(adRefreshInterval);
@@ -286,13 +278,10 @@ function finishStage(state, stageMin) {
   }
 
   saveSessionState(state);
-
-  // Page reload -> agla stage load hote hi apne aap start hoga
   alert('Stage complete! Agla stage (' + getStageDurationMinutes(state.stageIndex) + ' min) shuru hone wala hai.');
   location.reload();
 }
 
-// ---- User manually stops ----
 function stopEarningSession() {
   clearInterval(sessionInterval);
   clearInterval(adRefreshInterval);
@@ -306,7 +295,6 @@ function stopEarningSession() {
   document.getElementById('earningSessionScreen').style.display = 'none';
 }
 
-// ---- On page load: resume automatically if a stage was in progress ----
 window.addEventListener('load', () => {
   const state = getSessionState();
   updateDailyLimitText(state);
@@ -350,3 +338,6 @@ function saveCoinsToFirestore(amount) {
   });
 }
 </script>
+
+</body>
+</html>
