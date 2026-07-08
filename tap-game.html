@@ -1,251 +1,186 @@
-<!-- ============================================= -->
-<!-- AUTO EARNING FEATURE - MineFam (MULTI-STAGE)  -->
-<!-- Stages: 5 min -> 30 min -> 60 min -> 60 min... -->
-<!-- Total cap: 180 min (3 hours) per day           -->
-<!-- Page reloads between each stage                -->
-<!-- ============================================= -->
-
-<!-- 1) START EARNING BUTTON (Home screen pe dikhega) -->
-<div id="startEarningCard" style="text-align:center; padding:20px;">
-  <button id="startEarningBtn" onclick="startEarningSession()">
-    🚀 Start Earning
-  </button>
-  <p id="dailyLimitText" style="color:#aaa; font-size:12px; margin-top:8px;"></p>
-</div>
-
-<!-- 2) EARNING SESSION SCREEN (full screen overlay) -->
-<div id="earningSessionScreen" style="display:none;">
-  <div class="session-box">
-    <h2 id="stageTitle">Earning in Progress...</h2>
-    <div class="coin-counter" id="coinCounterDisplay">0.00</div>
-    <p class="session-subtext">Coins Earned (this session)</p>
-
-    <div class="progress-ring">
-      <div class="timer-text" id="sessionTimerDisplay">05:00</div>
-    </div>
-
-    <p class="stage-info" id="stageInfoText"></p>
-    <p class="warning-text">Screen ko band ya minimize mat karo, warna session ruk jayega</p>
-
-    <button id="stopEarningBtn" onclick="stopEarningSession()">Stop Session</button>
-  </div>
-
-  <!-- 3) BACKGROUND AD ZONE - Monetag script yahan aayega -->
-  <div id="backgroundAdZone" style="position:absolute; bottom:-9999px;">
-    <!--
-      MONETAG APPROVAL MILNE KE BAAD:
-      <script src="https://YOUR-MONETAG-ZONE-SCRIPT.js"></script>
-      yahan paste karna.
-    -->
-  </div>
-</div>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MineFam - Tap to Earn</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1113">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9713902784355107" crossorigin="anonymous"></script>
+  <script src="https://quge5.com/88/tag.min.js" data-zone="257366" async data-cfasync="false"></script>
 <style>
-#startEarningBtn, #stopEarningBtn {
-  background: linear-gradient(135deg, #6a11cb, #2575fc);
-  color: white;
-  border: none;
-  padding: 14px 32px;
-  border-radius: 30px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(106,17,203,0.4);
-}
-
-#earningSessionScreen {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.session-box { text-align: center; color: white; padding: 20px; }
-.coin-counter { font-size: 48px; font-weight: bold; color: #ffd700; margin: 10px 0; }
-.session-subtext { color: #ccc; margin-bottom: 20px; }
-
-.progress-ring {
-  width: 140px; height: 140px; border-radius: 50%;
-  border: 6px solid #6a11cb; border-top-color: #ffd700;
-  margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;
-  animation: spin 2s linear infinite;
-}
-.timer-text { color: white; font-size: 20px; font-weight: bold; }
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-.stage-info { font-size: 13px; color: #9be7ff; margin-bottom: 8px; }
-.warning-text { font-size: 12px; color: #ff6b6b; margin-bottom: 20px; }
-#stopEarningBtn { background: #ff4757; box-shadow: 0 4px 15px rgba(255,71,87,0.4); }
+  .game-wrap { display:flex; flex-direction:column; align-items:center; padding:20px; text-align:center; }
+  .tap-timer { font-size:15px; color:var(--text-dim,#9aa0a6); margin-bottom:6px; }
+  .tap-score { font-size:44px; font-weight:800; color:var(--gold,#f2b705); margin-bottom:18px; }
+  .tap-button {
+    width:190px; height:190px; border-radius:50%; border:none;
+    background:radial-gradient(circle at 35% 30%, #ffd76a, #f2b705 60%, #b98700 100%);
+    box-shadow:0 8px 24px rgba(242,183,5,0.4);
+    font-size:60px; color:#3a2900; user-select:none;
+    transition:transform 0.05s;
+  }
+  .tap-button:active { transform:scale(0.92); }
+  .tap-button:disabled { opacity:0.4; }
+  .plays-left { font-size:13px; color:var(--text-dim,#9aa0a6); margin-top:18px; }
+  .result-box {
+    margin-top:20px; padding:16px; border-radius:14px;
+    background:rgba(242,183,5,0.1); display:none;
+  }
+  .result-box.show { display:block; }
+  .start-btn {
+    margin-top:20px; padding:12px 28px; border:none; border-radius:24px;
+    background:linear-gradient(135deg,#6a11cb,#2575fc); color:#fff; font-weight:700; font-size:15px;
+  }
+  .start-btn:disabled { opacity:0.4; }
 </style>
+</head>
+<body>
 
-<script>
-// ================================
-// MULTI-STAGE AUTO EARNING SESSION
-// ================================
+<div class="app-shell">
+  <div class="topbar">
+    <div>
+      <div class="greet">Tap fast!</div>
+      <div class="username">Tap to Earn</div>
+    </div>
+    <div class="coin-pill">🪙 <span id="coinBalance">0</span></div>
+  </div>
 
-const STAGE_DURATIONS_MIN = [5, 30, 60];   // stage 1, 2, 3... beyond this, repeats last value (60)
-const TOTAL_CAP_MIN = 180;                 // 3 hours total per day
-const COIN_RATE_PER_TICK = 0.05;           // coins per ad refresh cycle
-const AD_REFRESH_SECONDS = 30;
+  <div class="game-wrap">
+    <div class="tap-timer" id="timerText">Get ready...</div>
+    <div class="tap-score" id="scoreText">0</div>
+    <button class="tap-button" id="tapButton" disabled>TAP</button>
 
-let sessionInterval = null;
-let adRefreshInterval = null;
-let secondsLeftInStage = 0;
-let coinsEarnedThisStage = 0;
+    <button class="start-btn" id="startBtn">Start (15s)</button>
+    <div class="plays-left" id="playsLeftText"></div>
 
-// ---- Storage key (per-day reset) ----
-function getStorageKey() {
-  const today = new Date().toISOString().slice(0, 10); // e.g. 2026-07-07
-  return 'earningSession_' + today;
+    <div class="result-box" id="resultBox">
+      <div style="font-size:15px; margin-bottom:6px;">Round over!</div>
+      <div style="font-size:14px; color:var(--text-dim,#9aa0a6);">Taps: <span id="finalTaps">0</span></div>
+      <div style="font-size:18px; color:var(--gold,#f2b705); font-weight:700; margin-top:6px;">+<span id="coinsWon">0</span> 🪙 earned</div>
+    </div>
+  </div>
+
+  <div style="text-align:center; margin-top:10px;">
+    <a href="games.html" style="color:var(--text-dim,#9aa0a6); font-size:13px; text-decoration:none;">← Back to Games</a>
+  </div>
+</div>
+
+<script type="module">
+import { auth, db, onAuthStateChanged, ref, get, update } from "./firebase-config.js";
+
+const MAX_PLAYS_PER_DAY = 3;
+const ROUND_SECONDS = 15;
+const COINS_PER_10_TAPS = 1;   // 1 coin per 10 taps
+const MAX_COINS_PER_ROUND = 15; // cap so a round can't give unlimited coins
+
+let currentUser = null;
+let tapCount = 0;
+let roundActive = false;
+let timeLeft = ROUND_SECONDS;
+let countdownInterval = null;
+
+const tapButton = document.getElementById('tapButton');
+const startBtn = document.getElementById('startBtn');
+const scoreText = document.getElementById('scoreText');
+const timerText = document.getElementById('timerText');
+const playsLeftText = document.getElementById('playsLeftText');
+const resultBox = document.getElementById('resultBox');
+const finalTaps = document.getElementById('finalTaps');
+const coinsWon = document.getElementById('coinsWon');
+
+function getTodayKey() {
+  return new Date().toISOString().slice(0, 10);
 }
 
-function getSessionState() {
-  const raw = localStorage.getItem(getStorageKey());
-  return raw ? JSON.parse(raw) : { stageIndex: 0, totalMinutesDone: 0, active: false };
-}
-
-function saveSessionState(state) {
-  localStorage.setItem(getStorageKey(), JSON.stringify(state));
-}
-
-function getStageDurationMinutes(stageIndex) {
-  if (stageIndex < STAGE_DURATIONS_MIN.length) {
-    return STAGE_DURATIONS_MIN[stageIndex];
-  }
-  return STAGE_DURATIONS_MIN[STAGE_DURATIONS_MIN.length - 1]; // repeat last (60 min)
-}
-
-// ---- Entry point: button click ----
-function startEarningSession() {
-  const state = getSessionState();
-
-  if (state.totalMinutesDone >= TOTAL_CAP_MIN) {
-    alert('Aaj ka 3 ghante ka earning limit complete ho chuka hai. Kal phir try karo.');
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
     return;
   }
+  currentUser = user;
 
-  state.active = true;
-  saveSessionState(state);
-  runCurrentStage(state);
-}
+  const snap = await get(ref(db, `users/${user.uid}`));
+  const data = snap.val() || {};
+  document.getElementById("coinBalance").textContent = Math.floor(data.coins || 0);
 
-// ---- Runs whichever stage is next ----
-function runCurrentStage(state) {
-  const remainingCapMin = TOTAL_CAP_MIN - state.totalMinutesDone;
-  let stageMin = getStageDurationMinutes(state.stageIndex);
-  if (stageMin > remainingCapMin) stageMin = remainingCapMin; // last stage trimmed to fit cap
+  const playsToday = (data.games && data.games.tapGame && data.games.tapGame[getTodayKey()]) || 0;
+  updatePlaysLeftText(playsToday);
 
-  secondsLeftInStage = stageMin * 60;
-  coinsEarnedThisStage = 0;
-
-  document.getElementById('earningSessionScreen').style.display = 'flex';
-  document.getElementById('stageTitle').innerText = 'Earning in Progress...';
-  document.getElementById('stageInfoText').innerText =
-    'Stage ' + (state.stageIndex + 1) + ' • ' + stageMin + ' min • Total so far: ' + state.totalMinutesDone + '/' + TOTAL_CAP_MIN + ' min';
-
-  updateDisplays();
-
-  sessionInterval = setInterval(() => {
-    secondsLeftInStage--;
-    updateDisplays();
-
-    if (secondsLeftInStage <= 0) {
-      finishStage(state, stageMin);
-    }
-  }, 1000);
-
-  adRefreshInterval = setInterval(() => {
-    reloadBackgroundAd();
-    coinsEarnedThisStage += COIN_RATE_PER_TICK;
-    updateDisplays();
-  }, AD_REFRESH_SECONDS * 1000);
-}
-
-// ---- Stage finished naturally (timer hit 0) ----
-function finishStage(state, stageMin) {
-  clearInterval(sessionInterval);
-  clearInterval(adRefreshInterval);
-
-  saveCoinsToFirestore(coinsEarnedThisStage);
-
-  state.totalMinutesDone += stageMin;
-  state.stageIndex += 1;
-
-  if (state.totalMinutesDone >= TOTAL_CAP_MIN) {
-    state.active = false;
-    saveSessionState(state);
-    alert('3 ghante ka session complete! Total coins ban chuke hain. Kal phir aana.');
-    document.getElementById('earningSessionScreen').style.display = 'none';
-    return;
-  }
-
-  saveSessionState(state);
-
-  // Page reload -> agla stage load hote hi apne aap start hoga
-  alert('Stage complete! Agla stage (' + getStageDurationMinutes(state.stageIndex) + ' min) shuru hone wala hai.');
-  location.reload();
-}
-
-// ---- User manually stops ----
-function stopEarningSession() {
-  clearInterval(sessionInterval);
-  clearInterval(adRefreshInterval);
-
-  saveCoinsToFirestore(coinsEarnedThisStage);
-
-  const state = getSessionState();
-  state.active = false;
-  saveSessionState(state);
-
-  document.getElementById('earningSessionScreen').style.display = 'none';
-}
-
-// ---- On page load: resume automatically if a stage was in progress ----
-window.addEventListener('load', () => {
-  const state = getSessionState();
-  updateDailyLimitText(state);
-
-  if (state.active && state.totalMinutesDone < TOTAL_CAP_MIN) {
-    runCurrentStage(state);
+  if (playsToday >= MAX_PLAYS_PER_DAY) {
+    startBtn.disabled = true;
+    startBtn.innerText = 'No plays left today';
   }
 });
 
-function updateDailyLimitText(state) {
-  const el = document.getElementById('dailyLimitText');
-  if (el) {
-    el.innerText = 'Aaj ka earning time: ' + state.totalMinutesDone + '/' + TOTAL_CAP_MIN + ' min';
+function updatePlaysLeftText(playsToday) {
+  const remaining = Math.max(0, MAX_PLAYS_PER_DAY - playsToday);
+  playsLeftText.innerText = remaining + ' / ' + MAX_PLAYS_PER_DAY + ' plays left today';
+}
+
+startBtn.addEventListener('click', startRound);
+tapButton.addEventListener('click', () => {
+  if (!roundActive) return;
+  tapCount++;
+  scoreText.innerText = tapCount;
+});
+
+function startRound() {
+  tapCount = 0;
+  timeLeft = ROUND_SECONDS;
+  scoreText.innerText = '0';
+  resultBox.classList.remove('show');
+  startBtn.disabled = true;
+  tapButton.disabled = false;
+  roundActive = true;
+  timerText.innerText = timeLeft + 's left';
+
+  countdownInterval = setInterval(() => {
+    timeLeft--;
+    timerText.innerText = timeLeft + 's left';
+    if (timeLeft <= 0) {
+      endRound();
+    }
+  }, 1000);
+}
+
+async function endRound() {
+  clearInterval(countdownInterval);
+  roundActive = false;
+  tapButton.disabled = true;
+  timerText.innerText = 'Round over';
+
+  const coinsEarned = Math.min(Math.floor(tapCount / 10) * COINS_PER_10_TAPS, MAX_COINS_PER_ROUND);
+
+  finalTaps.innerText = tapCount;
+  coinsWon.innerText = coinsEarned;
+  resultBox.classList.add('show');
+
+  // Save coins + increment today's play count
+  const userRef = ref(db, `users/${currentUser.uid}`);
+  const snap = await get(userRef);
+  const data = snap.val() || {};
+  const todayKey = getTodayKey();
+  const playsToday = (data.games && data.games.tapGame && data.games.tapGame[todayKey]) || 0;
+  const newPlays = playsToday + 1;
+  const newCoins = (data.coins || 0) + coinsEarned;
+
+  const updates = {};
+  updates.coins = newCoins;
+  updates[`games/tapGame/${todayKey}`] = newPlays;
+  await update(userRef, updates);
+
+  document.getElementById('coinBalance').textContent = Math.floor(newCoins);
+  updatePlaysLeftText(newPlays);
+
+  if (newPlays >= MAX_PLAYS_PER_DAY) {
+    startBtn.disabled = true;
+    startBtn.innerText = 'No plays left today';
+  } else {
+    startBtn.disabled = false;
+    startBtn.innerText = 'Play again (15s)';
   }
 }
-
-function updateDisplays() {
-  const mins = Math.floor(secondsLeftInStage / 60).toString().padStart(2, '0');
-  const secs = (secondsLeftInStage % 60).toString().padStart(2, '0');
-  document.getElementById('sessionTimerDisplay').innerText = mins + ':' + secs;
-  document.getElementById('coinCounterDisplay').innerText = coinsEarnedThisStage.toFixed(2);
-}
-
-function reloadBackgroundAd() {
-  const adZone = document.getElementById('backgroundAdZone');
-  const oldContent = adZone.innerHTML;
-  adZone.innerHTML = '';
-  setTimeout(() => { adZone.innerHTML = oldContent; }, 100);
-}
-
-function saveCoinsToFirestore(amount) {
-  if (amount <= 0) return;
-  const user = firebase.auth().currentUser;
-  if (!user) return;
-
-  const userRef = firebase.firestore().collection('users').doc(user.uid);
-  userRef.update({
-    coins: firebase.firestore.FieldValue.increment(amount)
-  }).catch((err) => {
-    console.error('Coin update failed:', err);
-  });
-}
-                       </script>
-                       
+</script>
+</body>
+</html>
