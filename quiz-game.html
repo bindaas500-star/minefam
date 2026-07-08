@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MineFam - Quiz</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1113">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9713902784355107" crossorigin="anonymous"></script>
+  <script src="https://quge5.com/88/tag.min.js" data-zone="257366" async data-cfasync="false"></script>
+<style>
+  .quiz-wrap { padding:20px; }
+  .quiz-progress { font-size:13px; color:var(--text-dim,#9aa0a6); margin-bottom:10px; text-align:center; }
+  .quiz-question {
+    background:rgba(255,255,255,0.06); border-radius:16px; padding:20px;
+    font-size:17px; font-weight:600; text-align:center; margin-bottom:18px; min-height:70px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .quiz-option {
+    display:block; width:100%; text-align:left; padding:14px 16px; margin-bottom:10px;
+    border-radius:12px; border:1px solid rgba(255,255,255,0.12);
+    background:rgba(255,255,255,0.04); color:#eee; font-size:15px;
+  }
+  .quiz-option.correct { background:rgba(46,204,113,0.25); border-color:#2ecc71; }
+  .quiz-option.wrong { background:rgba(231,76,60,0.25); border-color:#e74c3c; }
+  .quiz-option:disabled { opacity:0.85; }
+
+  .start-btn {
+    display:block; margin:20px auto 0; padding:12px 28px; border:none; border-radius:24px;
+    background:linear-gradient(135deg,#6a11cb,#2575fc); color:#fff; font-weight:700; font-size:15px;
+  }
+  .start-btn:disabled { opacity:0.4; }
+  .plays-left { text-align:center; font-size:13px; color:var(--text-dim,#9aa0a6); margin-top:14px; }
+
+  .result-box {
+    margin-top:20px; padding:16px; border-radius:14px; text-align:center;
+    background:rgba(242,183,5,0.1); display:none;
+  }
+  .result-box.show { display:block; }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+  <div class="topbar">
+    <div>
+      <div class="greet">Answer & earn</div>
+      <div class="username">Quiz</div>
+    </div>
+    <div class="coin-pill">🪙 <span id="coinBalance">0</span></div>
+  </div>
+
+  <div class="quiz-wrap">
+    <div id="preGame">
+      <div style="text-align:center; padding:30px 0;">
+        <div style="font-size:15px; color:var(--text-dim,#9aa0a6); margin-bottom:10px;">5 questions • 2 🪙 per correct answer</div>
+        <button class="start-btn" id="startBtn">Start Quiz</button>
+        <div class="plays-left" id="playsLeftText"></div>
+      </div>
+    </div>
+
+    <div id="gameArea" style="display:none;">
+      <div class="quiz-progress" id="quizProgress">Question 1 / 5</div>
+      <div class="quiz-question" id="quizQuestion"></div>
+      <div id="quizOptions"></div>
+    </div>
+
+    <div class="result-box" id="resultBox">
+      <div style="font-size:15px; margin-bottom:6px;">Quiz complete!</div>
+      <div style="font-size:14px; color:var(--text-dim,#9aa0a6);">Correct: <span id="finalCorrect">0</span> / 5</div>
+      <div style="font-size:18px; color:var(--gold,#f2b705); font-weight:700; margin-top:6px;">+<span id="coinsWon">0</span> 🪙 earned</div>
+      <button class="start-btn" id="playAgainBtn" style="display:none;">Play Again</button>
+    </div>
+  </div>
+
+  <div style="text-align:center; margin-top:10px;">
+    <a href="games.html" style="color:var(--text-dim,#9aa0a6); font-size:13px; text-decoration:none;">← Back to Games</a>
+  </div>
+</div>
+
+<script type="module">
+import { auth, db, onAuthStateChanged, ref, get, update } from "./firebase-config.js";
+
+const MAX_PLAYS_PER_DAY = 3;
+const QUESTIONS_PER_ROUND = 5;
+const COINS_PER_CORRECT = 2;
+
+const questionBank = [
+  { q: "What is the capital of Pakistan?", options: ["Karachi", "Lahore", "Islamabad", "Peshawar"], answer: 2 },
+  { q: "How many continents are there?", options: ["5", "6", "7", "8"], answer: 2 },
+  { q: "What is the largest ocean on Earth?", options: ["Atlantic", "Indian", "Arctic", "Pacific"], answer: 3 },
+  { q: "Which planet is known as the Red Planet?", options: ["Venus", "Mars", "Jupiter", "Saturn"], answer: 1 },
+  { q: "What is the chemical symbol for water?", options: ["H2O", "CO2", "O2", "NaCl"], answer: 0 },
+  { q: "How many days are there in a leap year?", options: ["364", "365", "366", "367"], answer: 2 },
+  { q: "What is the currency of Saudi Arabia?", options: ["Dinar", "Riyal", "Dirham", "Rupee"], answer: 1 },
+  { q: "Which is the fastest land animal?", options: ["Lion", "Cheetah", "Horse", "Leopard"], answer: 1 },
+  { q: "How many players are there in a football team (on field)?", options: ["9", "10", "11", "12"], answer: 2 },
+  { q: "What is the smallest prime number?", options: ["0", "1", "2", "3"], answer: 2 },
+  { q: "Which gas do plants absorb from the air?", options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"], answer: 2 },
+  { q: "What is the capital of Turkey?", options: ["Istanbul", "Ankara", "Izmir", "Antalya"], answer: 1 }
+];
+
+let currentUser = null;
+let roundQuestions = [];
+let currentIndex = 0;
+let correctCount = 0;
+let answering = false;
+
+const startBtn = document.getElementById('startBtn');
+const playsLeftText = document.getElementById('playsLeftText');
+const preGame = document.getElementById('preGame');
+const gameArea = document.getElementById('gameArea');
+const quizProgress = document.getElementById('quizProgress');
+const quizQuestion = document.getElementById('quizQuestion');
+const quizOptions = document.getElementById('quizOptions');
+const resultBox = document.getElementById('resultBox');
+const finalCorrect = document.getElementById('finalCorrect');
+const coinsWon = document.getElementById('coinsWon');
+const playAgainBtn = document.getElementById('playAgainBtn');
+
+function getTodayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+  currentUser = user;
+
+  const snap = await get(ref(db, `users/${user.uid}`));
+  const data = snap.val() || {};
+  document.getElementById("coinBalance").textContent = Math.floor(data.coins || 0);
+
+  const playsToday = (data.games && data.games.quizGame && data.games.quizGame[getTodayKey()]) || 0;
+  updatePlaysLeftText(playsToday);
+
+  if (playsToday >= MAX_PLAYS_PER_DAY) {
+    startBtn.disabled = true;
+    startBtn.innerText = 'No plays left today';
+  }
+});
+
+function updatePlaysLeftText(playsToday) {
+  const remaining = Math.max(0, MAX_PLAYS_PER_DAY - playsToday);
+  playsLeftText.innerText = remaining + ' / ' + MAX_PLAYS_PER_DAY + ' plays left today';
+}
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+startBtn.addEventListener('click', startQuiz);
+playAgainBtn.addEventListener('click', () => {
+  resultBox.classList.remove('show');
+  preGame.style.display = 'block';
+});
+
+function startQuiz() {
+  roundQuestions = shuffleArray(questionBank).slice(0, QUESTIONS_PER_ROUND);
+  currentIndex = 0;
+  correctCount = 0;
+
+  preGame.style.display = 'none';
+  resultBox.classList.remove('show');
+  gameArea.style.display = 'block';
+
+  showQuestion();
+}
+
+function showQuestion() {
+  answering = true;
+  const item = roundQuestions[currentIndex];
+  quizProgress.innerText = 'Question ' + (currentIndex + 1) + ' / ' + QUESTIONS_PER_ROUND;
+  quizQuestion.innerText = item.q;
+  quizOptions.innerHTML = '';
+
+  item.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    btn.innerText = opt;
+    btn.addEventListener('click', () => selectAnswer(idx));
+    quizOptions.appendChild(btn);
+  });
+}
+
+function selectAnswer(idx) {
+  if (!answering) return;
+  answering = false;
+  const item = roundQuestions[currentIndex];
+  const buttons = quizOptions.querySelectorAll('.quiz-option');
+
+  buttons.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === item.answer) btn.classList.add('correct');
+    else if (i === idx) btn.classList.add('wrong');
+  });
+
+  if (idx === item.answer) correctCount++;
+
+  setTimeout(() => {
+    currentIndex++;
+    if (currentIndex < QUESTIONS_PER_ROUND) {
+      showQuestion();
+    } else {
+      finishQuiz();
+    }
+  }, 900);
+}
+
+async function finishQuiz() {
+  gameArea.style.display = 'none';
+
+  const coinsEarned = correctCount * COINS_PER_CORRECT;
+  finalCorrect.innerText = correctCount;
+  coinsWon.innerText = coinsEarned;
+  resultBox.classList.add('show');
+
+  const userRef = ref(db, `users/${currentUser.uid}`);
+  const snap = await get(userRef);
+  const data = snap.val() || {};
+  const todayKey = getTodayKey();
+  const playsToday = (data.games && data.games.quizGame && data.games.quizGame[todayKey]) || 0;
+  const newPlays = playsToday + 1;
+  const newCoins = (data.coins || 0) + coinsEarned;
+
+  const updates = {};
+  updates.coins = newCoins;
+  updates[`games/quizGame/${todayKey}`] = newPlays;
+  await update(userRef, updates);
+
+  document.getElementById('coinBalance').textContent = Math.floor(newCoins);
+  updatePlaysLeftText(newPlays);
+
+  if (newPlays >= MAX_PLAYS_PER_DAY) {
+    playAgainBtn.style.display = 'none';
+    playsLeftText.innerText = '0 / ' + MAX_PLAYS_PER_DAY + ' plays left today';
+  } else {
+    playAgainBtn.style.display = 'inline-block';
+  }
+}
+</script>
+</body>
+</html>
