@@ -3,73 +3,236 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>MineFam - Live Rooms</title>
+<title>MineFam - Chat Room</title>
 <link rel="stylesheet" href="style.css">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f1113"> 
+<meta name="theme-color" content="#0f1113">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9713902784355107" crossorigin="anonymous"></script>
+  <script src="https://quge5.com/88/tag.min.js" data-zone="257366" async data-cfasync="false"></script>
+<style>
+  .chat-header {
+    display:flex; align-items:center; gap:10px; padding:14px 16px;
+    background:var(--bg-elevated, #16191c); border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .chat-header a { color:var(--text-dim,#9aa0a6); font-size:20px; text-decoration:none; }
+  .chat-header .room-title { font-weight:700; font-size:16px; flex:1; }
+  .chat-header .active-count { font-size:12px; color:var(--gold,#f2b705); }
+
+  .chat-messages {
+    display:flex; flex-direction:column; gap:10px;
+    padding:14px 16px 90px; overflow-y:auto;
+    height:calc(100vh - 130px);
+  }
+
+  .msg-row { display:flex; flex-direction:column; max-width:78%; }
+  .msg-row.own { align-self:flex-end; align-items:flex-end; }
+  .msg-row.other { align-self:flex-start; align-items:flex-start; }
+
+  .msg-name { font-size:11px; color:var(--text-dim,#9aa0a6); margin-bottom:2px; padding:0 6px; }
+  .msg-bubble {
+    padding:9px 13px; border-radius:14px; font-size:14px; line-height:1.4;
+    word-wrap:break-word; white-space:pre-wrap;
+  }
+  .msg-row.own .msg-bubble { background:linear-gradient(135deg,#6a11cb,#2575fc); color:#fff; border-bottom-right-radius:4px; }
+  .msg-row.other .msg-bubble { background:rgba(255,255,255,0.08); color:#eee; border-bottom-left-radius:4px; }
+  .msg-time { font-size:10px; color:var(--text-dim,#9aa0a6); margin-top:2px; padding:0 6px; }
+
+  .chat-input-bar {
+    position:fixed; bottom:0; left:0; right:0;
+    display:flex; gap:8px; padding:10px 12px;
+    background:var(--bg-elevated,#16191c); border-top:1px solid rgba(255,255,255,0.08);
+  }
+  .chat-input-bar input {
+    flex:1; border:none; outline:none; border-radius:22px;
+    padding:11px 16px; font-size:14px; background:rgba(255,255,255,0.08); color:#fff;
+  }
+  .chat-input-bar button {
+    border:none; border-radius:50%; width:44px; height:44px;
+    background:linear-gradient(135deg,#6a11cb,#2575fc); color:#fff; font-size:18px;
+  }
+
+  .coin-toast {
+    position:fixed; top:70px; left:50%; transform:translateX(-50%);
+    background:rgba(242,183,5,0.95); color:#111; font-weight:700;
+    padding:8px 16px; border-radius:20px; font-size:13px;
+    opacity:0; pointer-events:none; transition:opacity 0.4s;
+    z-index:999;
+  }
+  .coin-toast.show { opacity:1; }
+</style>
 </head>
 <body>
 
-<div class="app-shell">
-  <div class="topbar">
-    <div>
-      <div class="greet">Stay active</div>
-      <div class="username">Live Rooms</div>
-    </div>
-    <div class="coin-pill">🪙 <span id="coinBalance">0</span></div>
-  </div>
-
-  <div class="card" style="text-align:center;">
-    <div style="font-size:13px; color:var(--text-dim); margin-bottom:10px;">
-      Room mein active reh kar coins kamayen
-    </div>
-    <div style="font-size:12px; color:var(--gold);">+1 🪙 har 5 minute active rehne par</div>
-  </div>
-
-  <div class="section-title">Rooms</div>
-  <div id="roomList">
-    <div class="room-list-item">
-      <div class="room-icon">💬</div>
-      <div style="flex:1;">
-        <div style="font-weight:600; font-size:14px;">General Chat</div>
-        <div style="font-size:12px; color:var(--text-dim);">Sab miners yahan baat karen</div>
-      </div>
-      <a href="room.html?id=general" class="btn btn-ghost" style="width:auto; padding:8px 14px; font-size:13px;">Join</a>
-    </div>
-    <div class="room-list-item">
-      <div class="room-icon">⛏️</div>
-      <div style="flex:1;">
-        <div style="font-weight:600; font-size:14px;">Mining Tips</div>
-        <div style="font-size:12px; color:var(--text-dim);">Upgrade strategy share karen</div>
-      </div>
-      <a href="room.html?id=mining-tips" class="btn btn-ghost" style="width:auto; padding:8px 14px; font-size:13px;">Join</a>
-    </div>
-    <div class="room-list-item">
-      <div class="room-icon">👨‍👩‍👧</div>
-      <div style="flex:1;">
-        <div style="font-weight:600; font-size:14px;">Family Lounge</div>
-        <div style="font-size:12px; color:var(--text-dim);">Apni family ke saath connect</div>
-      </div>
-      <a href="room.html?id=family-lounge" class="btn btn-ghost" style="width:auto; padding:8px 14px; font-size:13px;">Join</a>
-    </div>
-    <div class="room-list-item" id="vipRoomItem" style="display:none;">
-      <div class="room-icon" style="background:linear-gradient(145deg, var(--gold), var(--gold-dim));">👑</div>
-      <div style="flex:1;">
-        <div style="font-weight:600; font-size:14px;">VIP Lounge</div>
-        <div style="font-size:12px; color:var(--text-dim);">Sirf VIP members ke liye</div>
-      </div>
-      <a href="room.html?id=vip-lounge" class="btn btn-ghost" style="width:auto; padding:8px 14px; font-size:13px;">Join</a>
-    </div>
+<div class="chat-header">
+  <a href="rooms.html">←</a>
+  <div>
+    <div class="room-title" id="roomTitle">Room</div>
+    <div class="active-count" id="activeCount">Loading...</div>
   </div>
 </div>
 
-<nav class="bottom-nav">
-  <a href="dashboard.html" class="nav-item"><span class="nav-icon">⛏️</span>Mine</a>
-  <a href="family.html" class="nav-item"><span class="nav-icon">👨‍👩‍👧</span>Family</a>
-  <div class="nav-item active"><span class="nav-icon">💬</span>Rooms</div>
-</nav>
+<div class="chat-messages" id="chatMessages">
+  <!-- messages injected here -->
+</div>
 
-<script type="module" src="rooms.js"></script>
+<div class="chat-input-bar">
+  <input type="text" id="messageInput" placeholder="Type a message..." maxlength="300">
+  <button id="sendBtn">➤</button>
+</div>
+
+<div class="coin-toast" id="coinToast">+1 🪙 for staying active</div>
+
+<script type="module">
+import {
+  auth, db, onAuthStateChanged,
+  ref, get, push, set, onValue, update,
+  query, orderByChild, limitToLast
+} from "./firebase-config.js";
+
+// ---- Get room ID from URL ----
+const params = new URLSearchParams(window.location.search);
+const roomId = params.get('id') || 'general';
+
+const roomNames = {
+  'general': 'General Chat',
+  'mining-tips': 'Mining Tips',
+  'family-lounge': 'Family Lounge',
+  'vip-lounge': 'VIP Lounge'
+};
+document.getElementById('roomTitle').innerText = roomNames[roomId] || 'Room';
+
+let currentUser = null;
+let currentUserName = 'Miner';
+let currentUserPhoto = null;
+
+const messagesEl = document.getElementById('chatMessages');
+const inputEl = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+const activeCountEl = document.getElementById('activeCount');
+const coinToast = document.getElementById('coinToast');
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+  currentUser = user;
+
+  const snap = await get(ref(db, `users/${user.uid}`));
+  const data = snap.val() || {};
+  currentUserName = data.displayName || 'Miner';
+  currentUserPhoto = data.photoURL || null;
+
+  // VIP-only room check
+  if (roomId === 'vip-lounge' && !data.isVIP) {
+    alert('This room is for VIP members only.');
+    window.location.href = "rooms.html";
+    return;
+  }
+
+  loadMessages();
+  markActive();
+  startActiveRewardTimer();
+});
+
+// ---- Load & listen to messages in real time ----
+function loadMessages() {
+  const messagesRef = query(
+    ref(db, `rooms/${roomId}/messages`),
+    orderByChild('timestamp'),
+    limitToLast(100)
+  );
+
+  onValue(messagesRef, (snapshot) => {
+    messagesEl.innerHTML = '';
+    const data = snapshot.val();
+    if (!data) return;
+
+    const messages = Object.entries(data).sort((a, b) => (a[1].timestamp || 0) - (b[1].timestamp || 0));
+
+    messages.forEach(([key, msg]) => {
+      const isOwn = msg.uid === currentUser.uid;
+      const row = document.createElement('div');
+      row.className = 'msg-row ' + (isOwn ? 'own' : 'other');
+
+      const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+      row.innerHTML = `
+        ${!isOwn ? `<div class="msg-name">${escapeHtml(msg.name || 'Miner')}</div>` : ''}
+        <div class="msg-bubble">${escapeHtml(msg.text || '')}</div>
+        <div class="msg-time">${time}</div>
+      `;
+      messagesEl.appendChild(row);
+    });
+
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  });
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.innerText = str;
+  return div.innerHTML;
+}
+
+// ---- Send message ----
+async function sendMessage() {
+  const text = inputEl.value.trim();
+  if (!text || !currentUser) return;
+
+  const messagesRef = ref(db, `rooms/${roomId}/messages`);
+  const newMsgRef = push(messagesRef);
+
+  await set(newMsgRef, {
+    uid: currentUser.uid,
+    name: currentUserName,
+    text: text,
+    timestamp: Date.now()
+  });
+
+  inputEl.value = '';
+}
+
+sendBtn.addEventListener('click', sendMessage);
+inputEl.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') sendMessage();
+});
+
+// ---- Mark user as active in this room (for active-user count) ----
+function markActive() {
+  const activeRef = ref(db, `rooms/${roomId}/active/${currentUser.uid}`);
+  set(activeRef, { name: currentUserName, lastSeen: Date.now() });
+
+  const activeListRef = ref(db, `rooms/${roomId}/active`);
+  onValue(activeListRef, (snapshot) => {
+    const data = snapshot.val() || {};
+    const now = Date.now();
+    const activeUsers = Object.values(data).filter(u => (now - u.lastSeen) < 2 * 60 * 1000);
+    activeCountEl.innerText = activeUsers.length + ' active now';
+  });
+
+  // Refresh presence every 60s
+  setInterval(() => {
+    set(activeRef, { name: currentUserName, lastSeen: Date.now() });
+  }, 60000);
+}
+
+// ---- +1 coin every 5 minutes of staying active in the room ----
+function startActiveRewardTimer() {
+  setInterval(async () => {
+    const userRef = ref(db, `users/${currentUser.uid}`);
+    const snap = await get(userRef);
+    const data = snap.val() || {};
+    const newCoins = (data.coins || 0) + 1;
+    await update(userRef, { coins: newCoins });
+    showCoinToast();
+  }, 5 * 60 * 1000);
+}
+
+function showCoinToast() {
+  coinToast.classList.add('show');
+  setTimeout(() => coinToast.classList.remove('show'), 2500);
+}
+</script>
 </body>
 </html>
