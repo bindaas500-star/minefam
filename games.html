@@ -1,206 +1,69 @@
-<!-- ============================================= -->
-<!-- AUTO EARNING FEATURE - MineFam                -->
-<!-- Isko apni dashboard.html (ya jahan bhi Home    -->
-<!-- screen hai) us file ke <body> mein add karo    -->
-<!-- ============================================= -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MineFam - Games</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1113">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9713902784355107" crossorigin="anonymous"></script>
+  <script src="https://quge5.com/88/tag.min.js" data-zone="257366" async data-cfasync="false"></script>
+</head>
+<body>
 
-<!-- 1) START EARNING BUTTON (Home screen pe dikhega) -->
-<div id="startEarningCard" style="text-align:center; padding:20px;">
-  <button id="startEarningBtn" onclick="startEarningSession()">
-    🚀 Start Earning
-  </button>
-</div>
-
-<!-- 2) EARNING SESSION SCREEN (full screen overlay) -->
-<div id="earningSessionScreen" style="display:none;">
-  <div class="session-box">
-    <h2>Earning in Progress...</h2>
-    <div class="coin-counter" id="coinCounterDisplay">0.00</div>
-    <p class="session-subtext">Coins Earned</p>
-
-    <div class="progress-ring">
-      <div class="timer-text" id="sessionTimerDisplay">05:00</div>
+<div class="app-shell">
+  <div class="topbar">
+    <div>
+      <div class="greet">Play & earn</div>
+      <div class="username">Games</div>
     </div>
-
-    <p class="warning-text">Screen ko band ya minimize mat karo, warna session ruk jayega</p>
-
-    <button id="stopEarningBtn" onclick="stopEarningSession()">Stop Session</button>
+    <div class="coin-pill">🪙 <span id="coinBalance">0</span></div>
   </div>
 
-  <!-- 3) BACKGROUND AD ZONE - Monetag script yahan aayega -->
-  <div id="backgroundAdZone" style="position:absolute; bottom:-9999px;">
-    <!--
-      MONETAG APPROVAL MILNE KE BAAD:
-      Monetag dashboard se jo <script> tag milega usko
-      yahan paste kar dena. Example (placeholder - abhi
-      real nahi hai):
-
-      <script src="https://YOUR-MONETAG-ZONE-SCRIPT.js"></script>
-
-      Ye ad har refresh cycle (30 sec) pe reload hoga
-      taaki impressions count ho.
-    -->
+  <div class="section-title">Choose a game</div>
+  <div class="tile-grid">
+    <a href="tap-game.html" class="tile">
+      <div class="icon-box" style="background:rgba(242,183,5,0.15); color:var(--gold);">👆</div>
+      <div class="label">Tap to Earn</div>
+      <div class="sub">Tap fast, earn coins</div>
+    </a>
+    <a href="quiz-game.html" class="tile">
+      <div class="icon-box" style="background:rgba(47,211,199,0.15); color:var(--teal);">🧠</div>
+      <div class="label">Quiz</div>
+      <div class="sub">Answer & earn</div>
+    </a>
+    <a href="memory-game.html" class="tile">
+      <div class="icon-box" style="background:rgba(242,183,5,0.15); color:var(--gold);">🎴</div>
+      <div class="label">Memory Match</div>
+      <div class="sub">Match pairs</div>
+    </a>
+    <a href="reaction-game.html" class="tile">
+      <div class="icon-box" style="background:rgba(47,211,199,0.15); color:var(--teal);">⚡</div>
+      <div class="label">Catch the Coin</div>
+      <div class="sub">Test your reflex</div>
+    </a>
   </div>
 </div>
 
-<style>
-#startEarningBtn, #stopEarningBtn {
-  background: linear-gradient(135deg, #6a11cb, #2575fc);
-  color: white;
-  border: none;
-  padding: 14px 32px;
-  border-radius: 30px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(106,17,203,0.4);
-}
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="nav-item"><span class="nav-icon">⛏️</span>Mine</a>
+  <a href="family.html" class="nav-item"><span class="nav-icon">👨‍👩‍👧</span>Family</a>
+  <a href="rooms.html" class="nav-item"><span class="nav-icon">💬</span>Rooms</a>
+</nav>
 
-#earningSessionScreen {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: #0f0c29;
-  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+<script type="module">
+import { auth, db, onAuthStateChanged, ref, get } from "./firebase-config.js";
 
-.session-box {
-  text-align: center;
-  color: white;
-  padding: 20px;
-}
-
-.coin-counter {
-  font-size: 48px;
-  font-weight: bold;
-  color: #ffd700;
-  margin: 10px 0;
-}
-
-.session-subtext {
-  color: #ccc;
-  margin-bottom: 20px;
-}
-
-.progress-ring {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  border: 6px solid #6a11cb;
-  border-top-color: #ffd700;
-  margin: 0 auto 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: spin 2s linear infinite;
-}
-
-.timer-text {
-  color: white;
-  font-size: 20px;
-  font-weight: bold;
-  animation: none;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.warning-text {
-  font-size: 12px;
-  color: #ff6b6b;
-  margin-bottom: 20px;
-}
-
-#stopEarningBtn {
-  background: #ff4757;
-  box-shadow: 0 4px 15px rgba(255,71,87,0.4);
-}
-</style>
-
-<script>
-// ================================
-// AUTO EARNING SESSION LOGIC
-// ================================
-
-let sessionInterval = null;
-let adRefreshInterval = null;
-let sessionSecondsLeft = 300;      // 5 min session (adjust as needed)
-let coinsEarned = 0;
-const COIN_RATE_PER_TICK = 0.05;   // coins added every ad refresh cycle
-const AD_REFRESH_SECONDS = 30;     // background ad refresh interval
-
-function startEarningSession() {
-  document.getElementById('earningSessionScreen').style.display = 'flex';
-  sessionSecondsLeft = 300;
-  coinsEarned = 0;
-  updateDisplays();
-
-  // Main countdown timer
-  sessionInterval = setInterval(() => {
-    sessionSecondsLeft--;
-    updateDisplays();
-
-    if (sessionSecondsLeft <= 0) {
-      finishEarningSession();
-    }
-  }, 1000);
-
-  // Ad refresh + coin reward cycle
-  adRefreshInterval = setInterval(() => {
-    reloadBackgroundAd();
-    coinsEarned += COIN_RATE_PER_TICK;
-    updateDisplays();
-  }, AD_REFRESH_SECONDS * 1000);
-}
-
-function stopEarningSession() {
-  clearInterval(sessionInterval);
-  clearInterval(adRefreshInterval);
-  document.getElementById('earningSessionScreen').style.display = 'none';
-  saveCoinsToFirestore(coinsEarned);
-}
-
-function finishEarningSession() {
-  clearInterval(sessionInterval);
-  clearInterval(adRefreshInterval);
-  document.getElementById('earningSessionScreen').style.display = 'none';
-  saveCoinsToFirestore(coinsEarned);
-  alert('Session complete! ' + coinsEarned.toFixed(2) + ' coins added.');
-}
-
-function updateDisplays() {
-  const mins = Math.floor(sessionSecondsLeft / 60).toString().padStart(2, '0');
-  const secs = (sessionSecondsLeft % 60).toString().padStart(2, '0');
-  document.getElementById('sessionTimerDisplay').innerText = mins + ':' + secs;
-  document.getElementById('coinCounterDisplay').innerText = coinsEarned.toFixed(2);
-}
-
-function reloadBackgroundAd() {
-  // Ye function background ad zone ko refresh karega
-  // Monetag script load hone ke baad is div ko refresh karna hoga
-  const adZone = document.getElementById('backgroundAdZone');
-  const oldContent = adZone.innerHTML;
-  adZone.innerHTML = '';
-  setTimeout(() => { adZone.innerHTML = oldContent; }, 100);
-}
-
-function saveCoinsToFirestore(amount) {
-  // NOTE: Ye tumhare existing Firebase setup ke saath jodna hai.
-  // Firebase already initialized hona chahiye is file se pehle.
-  const user = firebase.auth().currentUser;
-  if (!user) return;
-
-  const userRef = firebase.firestore().collection('users').doc(user.uid);
-  userRef.update({
-    coins: firebase.firestore.FieldValue.increment(amount)
-  }).catch((err) => {
-    console.error('Coin update failed:', err);
-  });
-}
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+  const snap = await get(ref(db, `users/${user.uid}`));
+  const data = snap.val() || {};
+  document.getElementById("coinBalance").textContent = Math.floor(data.coins || 0);
+});
 </script>
+</body>
+</html>
