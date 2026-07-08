@@ -74,6 +74,11 @@
       <div class="label">Feed</div>
       <div class="sub">Post & connect</div>
     </a>
+    <a href="games.html" class="tile">
+      <div class="icon-box" style="background:rgba(242,183,5,0.15); color:var(--gold);">🎮</div>
+      <div class="label">Games</div>
+      <div class="sub">Play & earn</div>
+    </a>
     <a href="profile.html" class="tile">
       <div class="icon-box" style="background:rgba(47,211,199,0.15); color:var(--teal);">👤</div>
       <div class="label">Profile</div>
@@ -216,6 +221,22 @@ function getStageDurationMinutes(stageIndex) {
   return STAGE_DURATIONS_MIN[STAGE_DURATIONS_MIN.length - 1];
 }
 
+function loadMonetagScript() {
+  if (document.getElementById('monetagScript')) return; // already loaded
+  const s = document.createElement('script');
+  s.id = 'monetagScript';
+  s.src = 'https://quge5.com/88/tag.min.js';
+  s.setAttribute('data-zone', '257366');
+  s.async = true;
+  s.setAttribute('data-cfasync', 'false');
+  document.head.appendChild(s);
+}
+
+function removeMonetagScript() {
+  const s = document.getElementById('monetagScript');
+  if (s) s.remove();
+}
+
 function startEarningSession() {
   const state = getSessionState();
 
@@ -224,6 +245,7 @@ function startEarningSession() {
     return;
   }
 
+  loadMonetagScript();
   state.active = true;
   saveSessionState(state);
   runCurrentStage(state);
@@ -272,6 +294,7 @@ function finishStage(state, stageMin) {
   if (state.totalMinutesDone >= TOTAL_CAP_MIN) {
     state.active = false;
     saveSessionState(state);
+    removeMonetagScript();
     alert('3-hour session complete! Your coins have been added. Come back tomorrow for more.');
     document.getElementById('earningSessionScreen').style.display = 'none';
     return;
@@ -292,6 +315,7 @@ function stopEarningSession() {
   state.active = false;
   saveSessionState(state);
 
+  removeMonetagScript();
   document.getElementById('earningSessionScreen').style.display = 'none';
 }
 
@@ -300,6 +324,7 @@ window.addEventListener('load', () => {
   updateDailyLimitText(state);
 
   if (state.active && state.totalMinutesDone < TOTAL_CAP_MIN) {
+    loadMonetagScript();
     runCurrentStage(state);
   }
 });
